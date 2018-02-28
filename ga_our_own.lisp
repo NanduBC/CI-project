@@ -127,8 +127,8 @@
 				)
 				
 				(loop for y from 1 to 5
-					do( 
-						if (oddp y)
+					do( (lambda () 
+						(if (oddp y)
 							;uniform crossover
 							(
 								(lambda () (setf c1 (append c1 (car p1))))
@@ -138,13 +138,13 @@
 								((lambda () (setf c1 (append c1 (car p2))))
 								(lambda () (setf c2 (append c2 (car p1)))))
 								
-						
+						)
 						
 							(lambda () (setf p1 (cdr p1)))
 							(lambda () (setf p2 (cdr p2)))
 							)										
 						)
-					
+					)
 				
 					
 				
@@ -188,7 +188,7 @@
 			;	
 
 
-
+			
 
 
 
