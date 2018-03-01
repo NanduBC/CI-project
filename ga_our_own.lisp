@@ -75,11 +75,13 @@
 
 (defun fitness (AW dataset)
 	(loop for x in (2d-array-to-list AW)
-		do (setq fitList (append fitList (list (/ 1 (+ 1 (closeness x  dataset) )))))
+		do (
+			setq fitList (append fitList (list (/ 1 (+ 1 (closeness x  dataset) ))))
 		)
+	)
 	;(/ 1 (+ 1 (closeness (list (aref AW i 0) (aref AW i 1) (aref AW i 2) (aref AW i 3) (aref AW i 4))  dataset) ))
 
-	)
+)
 
 (setf totalsum 0.0)
 (setf partsum 0.0)
@@ -88,22 +90,22 @@
 (defun roulette-wheel (fitList)
 	(setf totalsum (loop for x in fitList sum x))
 	(setf r (rand-val totalsum))
-	(print r)
-	(print AW)
+	(setf partsum 0.0)
+	(setf count 0)
 	(loop for x in fitList
-		do((lambda()
-				(
-					if (> partsum r) 
+		do(progn
+
+		    (if (> partsum r)
 				(setf i count)
 				(progn
 					(setf partsum (+ partsum x))
 					(incf count)
-				))
+				)
 			)
-			
+
 		)
 	)
-	count 
+	count
 )
 
 (defun get-list (i aw_list)
@@ -118,88 +120,128 @@
 (setf p2 '())
 (setf c2 '())
 (setf c1 '())
-(defun cross-over (AW dataset)
-	(loop for x from 1 to 3
-		do(
-						
-				(lambda () (setf p1 (get-list (roulette-wheel (fitList) (2d-array-to-list AW)))))
-				(lambda () (setf p2 (get-list (roulette-wheel (fitList) (2d-array-to-list AW))))
-				)
-				
-				(loop for y from 1 to 5
-					do( (lambda () 
-						(if (oddp y)
-							;uniform crossover
-							(
-								(lambda () (setf c1 (append c1 (car p1))))
-								(lambda () (setf c2 (append c2 (car p2)))))
-								
-							
-								((lambda () (setf c1 (append c1 (car p2))))
-								(lambda () (setf c2 (append c2 (car p1)))))
-								
-						)
-						
-							(lambda () (setf p1 (cdr p1)))
-							(lambda () (setf p2 (cdr p2)))
-							)										
-						)
-					)
-				
-					
-				
-					(lambda () (setf newpop (append newpop c1)))
-						(lambda () (setf newpop (append newpop c2)))
-					
-				
 
-			;	(lambda ()				
-			;	 ((setf p1 (get-list (roulette-wheel (fitList) (2d-array-to-list AW))))
-			;	(setf p2 (get-list (roulette-wheel (fitList) (2d-array-to-list AW))))
-			;	) 
-			;	)
-
-			;	(loop for y from 1 to 5
-			;		do(  
-			;			(if (oddp y)
-							;uniform crossover
-			;				((lambda ()
-			;					((setf c1 (append c1 (car p1)))
-			;					(setf c2 (append c2 (car p2))))
-			;					))
-			;				((lambda ()
-			;					((setf c1 (append c1 (car p2)))
-			;					(setf c2 (append c2 (car p1))))
-			;					))
-			;			)
-			;			(lambda () 
-			;				((setf p1 (cdr p1))
-			;				 (setf p2 (cdr p2))
-			;				)										
-			;			)
-			;		)
-			;	)
-				
-
-			;	(lambda ()
-			;		((setf newpop (append newpop c1))
-			;	     (setf newpop (append newpop c2)))
-			;		)
-			;	
+(defun cross-over (AW fitList)
+	(dotimes (i 3) (progn
+	(setf p1 (get-list (roulette-wheel fitList) (2d-array-to-list AW)))
+	(setf p2 (get-list (roulette-wheel fitList) (2d-array-to-list AW)))
+	(setf c1 '())
+	(setf c2 '())
+	(loop for y from 1 to 5
+		do(progn
+			(if (oddp y)
+				;uniform crossover
+				(progn
+		            (setf c1 (append c1 (list (car p1))))
+		            (setf c2 (append c2 (list (car p2))))
+		            )
 
 
-			
-
-
-
-
-
+			(progn
+				(setf c1 (append c1 (list (car p2))))
+				(setf c2 (append c2 (list (car p1))))
+			)
+			)
+			(setf p1 (cdr p1))
+			(setf p2 (cdr p2))
+			)
 
 		)
-			
+
+		(setf newpop (append newpop (list c1)))
+		(setf newpop (append newpop (list c2)))
+		)
+
+	)
+)	
+
+(defvar newfitList '())
+
+(defun fitness-again (aw_list dataset)
+	(loop for x in aw_list
+		do(
+			setf newfitList (append newfitList (list (/ 1 (+ 1 (closeness x  dataset) ))))
+		)
 	)
 )
 
+(defun maxq (list1) 
+	(if (eq (length list1) 1)
+		(car list1)
+		(if (> (car list1) (maxq (cdr list1)))
+			(car list1)
+			(maxq (cdr list1))
+		)
+	)
+)
+
+(defun minq (list1) 
+	(if (eq (length list1) 1)
+		(car list1)
+		(if (< (car list1) (minq (cdr list1)))
+			(car list1)
+			(minq (cdr list1))
+		)
+	)
+)
+
+(defun remove-min (list1)
+	(
+		if (eq (length list1) 1)
+		'()
+		(
+			if (= (car list1) (minq list1))
+			(cdr list1)
+			(append (list (car list1)) (remove-min (cdr list1)))
+		)
+	)
+)
+
+(defun remove-max (list1)
+	(
+		if (eq (length list1) 1)
+		'()
+		(
+			if (= (car list1) (maxq list1))
+			(cdr list1)
+			(append (list (car list1)) (remove-max (cdr list1)))
+		)
+	)
+)
+
+(defun remove-index (i list1)
+	(
+		if(= i 1)
+		(cdr list1)
+		(append (list (car list1)) (remove-index (decf i) (cdr list1)))
+	)
+)
+
+(defun search-index (val list1)
+	(
+		if(= val (car list1))
+		1
+		(+ 1 (search-index val (cdr list1)))
+	)
+)
+
+(defun replace-chromes (aw_list newpop fitList newfitList) 
+	;(loop while (or (not(null newfitList)) (> (maxq newfitList) (minq fitList)))
+	;do
+			( prog2
+				
+				(setq aw_list (remove-index (search-index (minq fitList) fitList) aw_list))
+				(setq aw_list (append aw_list (list (get-list (search-index (maxq newfitList) newfitList) newpop))))
+				(setq newpop (remove-index (search-index (maxq newfitList) newfitList) newpop))
+				(setq fitList (remove-index (search-index (minq fitList) fitList) fitList))
+				(setq newfitList (remove-index (search-index (maxq newfitList) newfitList) newfitList)))		
+				
+			
+			
+			)
+	
+;)
+;)
 
 ;defun mutation (AW)
 ;	()
@@ -208,7 +250,13 @@
 ;(print (closeness '(1 2 3 4 5) dataset))
 ;(print (aref AW 0 0))
 (fitness AW dataset)
-(print fitList)
-(cross-over AW dataset)
-(print newpop)
+;(print fitList)
+(cross-over AW fitList)
+;(print newpop)
+(fitness-again newpop dataset)
+(print (replace-chromes (2d-array-to-list AW) newpop fitList newfitList))
+;(print newfitList)
+;(print newfitList)
+;(print c1)
+;(print c2)
 ;(print (get-list (roulette-wheel fitList) (2d-array-to-list AW)))
