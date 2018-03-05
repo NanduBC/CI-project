@@ -71,6 +71,12 @@
   (loop for i below (array-dimension array 0)
         collect (loop for j below (array-dimension array 1)
                       collect (aref array i j))))	
+
+(defun list-to-2d-array (list1)
+  (make-array (list (length list1)
+                    (length (first list1)))
+              :initial-contents list1))
+
 (defvar fitList '())
 
 (defun fitness (AW dataset)
@@ -225,38 +231,75 @@
 	)
 )
 
-(defun replace-chromes (aw_list newpop fitList newfitList) 
-	;(loop while (or (not(null newfitList)) (> (maxq newfitList) (minq fitList)))
-	;do
+(defun replace-chromes (aw_list newpop fitList newfitList)
+;(loop while (or (not(null newfitList)) (> (maxq newfitList) (minq fitList)))
+;do
 			( prog2
-				
+
 				(setq aw_list (remove-index (search-index (minq fitList) fitList) aw_list))
 				(setq aw_list (append aw_list (list (get-list (search-index (maxq newfitList) newfitList) newpop))))
 				(setq newpop (remove-index (search-index (maxq newfitList) newfitList) newpop))
 				(setq fitList (remove-index (search-index (minq fitList) fitList) fitList))
-				(setq newfitList (remove-index (search-index (maxq newfitList) newfitList) newfitList)))		
-				
-			
-			
-			)
-	
-;)
-;)
+				(setq newfitList (remove-index (search-index (maxq newfitList) newfitList) newfitList)))
 
-;defun mutation (AW)
-;	()
-;	)
-;(print (wt-sum '(1 2 3 4 5) '(1 2 3 4 5)))
-;(print (closeness '(1 2 3 4 5) dataset))
-;(print (aref AW 0 0))
+			(if(or (not(null newfitList)) (> (maxq newfitList) (minq fitList)))
+				(prog2
+
+					(setq aw_list (remove-index (search-index (minq fitList) fitList) aw_list))
+					(setq aw_list (append aw_list (list (get-list (search-index (maxq newfitList) newfitList) newpop))))
+					(setq newpop (remove-index (search-index (maxq newfitList) newfitList) newpop))
+					(setq fitList (remove-index (search-index (minq fitList) fitList) fitList))
+					(setq newfitList (remove-index (search-index (maxq newfitList) newfitList) newfitList)))
+			)
+			(if(or (not(null newfitList)) (> (maxq newfitList) (minq fitList)))
+				(prog2
+
+					(setq aw_list (remove-index (search-index (minq fitList) fitList) aw_list))
+					(setq aw_list (append aw_list (list (get-list (search-index (maxq newfitList) newfitList) newpop))))
+					(setq newpop (remove-index (search-index (maxq newfitList) newfitList) newpop))
+					(setq fitList (remove-index (search-index (minq fitList) fitList) fitList))
+					(setq newfitList (remove-index (search-index (maxq newfitList) newfitList) newfitList)))
+			)
+			(if(or (not(null newfitList)) (> (maxq newfitList) (minq fitList)))
+				(prog2
+
+					(setq aw_list (remove-index (search-index (minq fitList) fitList) aw_list))
+					(setq aw_list (append aw_list (list (get-list (search-index (maxq newfitList) newfitList) newpop))))
+					(setq newpop (remove-index (search-index (maxq newfitList) newfitList) newpop))
+					(setq fitList (remove-index (search-index (minq fitList) fitList) fitList))
+					(setq newfitList (remove-index (search-index (maxq newfitList) newfitList) newfitList)))
+			)
+			(if(or (not(null newfitList)) (> (maxq newfitList) (minq fitList)))
+				(prog2
+
+					(setq aw_list (remove-index (search-index (minq fitList) fitList) aw_list))
+					(setq aw_list (append aw_list (list (get-list (search-index (maxq newfitList) newfitList) newpop))))
+					(setq newpop (remove-index (search-index (maxq newfitList) newfitList) newpop))
+					(setq fitList (remove-index (search-index (minq fitList) fitList) fitList))
+					(setq newfitList (remove-index (search-index (maxq newfitList) newfitList) newfitList)))
+			)
+			(if(or (not(null newfitList)) (> (maxq newfitList) (minq fitList)))
+				(prog2
+
+					(setq aw_list (remove-index (search-index (minq fitList) fitList) aw_list))
+					(setq aw_list (append aw_list (list (get-list (search-index (maxq newfitList) newfitList) newpop))))
+					(setq newpop (remove-index (search-index (maxq newfitList) newfitList) newpop))
+					(setq fitList (remove-index (search-index (minq fitList) fitList) fitList))
+					(setq newfitList (remove-index (search-index (maxq newfitList) newfitList) newfitList)))
+			)
+			)
+
+
 (fitness AW dataset)
 ;(print fitList)
 (cross-over AW fitList)
 ;(print newpop)
 (fitness-again newpop dataset)
-(print (replace-chromes (2d-array-to-list AW) newpop fitList newfitList))
-;(print newfitList)
-;(print newfitList)
+(defun genetic (AW dataset)
+	(print (list-to-2d-array (replace-chromes (2d-array-to-list AW) newpop fitList newfitList)))
+)
+(genetic AW dataset)
+;
 ;(print c1)
 ;(print c2)
 ;(print (get-list (roulette-wheel fitList) (2d-array-to-list AW)))
