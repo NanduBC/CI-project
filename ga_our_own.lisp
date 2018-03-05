@@ -80,6 +80,7 @@
 (defvar fitList '())
 
 (defun fitness (AW dataset)
+	(setf fitList '())
 	(loop for x in (2d-array-to-list AW)
 		do (
 			setq fitList (append fitList (list (/ 1 (+ 1 (closeness x  dataset) ))))
@@ -164,6 +165,7 @@
 (defvar newfitList '())
 
 (defun fitness-again (aw_list dataset)
+	(setq newfitList '())
 	(loop for x in aw_list
 		do(
 			setf newfitList (append newfitList (list (/ 1 (+ 1 (closeness x  dataset) ))))
@@ -290,15 +292,28 @@
 			)
 
 
-(fitness AW dataset)
+;(fitness AW dataset)
 ;(print fitList)
-(cross-over AW fitList)
+;(cross-over AW fitList)
 ;(print newpop)
-(fitness-again newpop dataset)
+;(fitness-again newpop dataset)
 (defun genetic (AW dataset)
-	(print (list-to-2d-array (replace-chromes (2d-array-to-list AW) newpop fitList newfitList)))
-)
+
+	;(setq newAW (list-to-2d-array (replace-chromes (2d-array-to-list AW) newpop fitList newfitList)))
+
+	(dotimes (i 3)
+		(fitness AW dataset)
+		(cross-over AW fitList)
+		(fitness-again newpop dataset)
+		(setq AW (list-to-2d-array (replace-chromes (2d-array-to-list AW) newpop fitList newfitList)))
+		;(fitness AW dataset)
+		;(print fitList)
+		
+		)
+
+		)
 (genetic AW dataset)
+
 ;
 ;(print c1)
 ;(print c2)
