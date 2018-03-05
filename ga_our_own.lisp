@@ -12,7 +12,7 @@
 (165.525 167.37 164.7 166.97 470)
 (170.16 170.16 167.07 167.45 420)))
 
-(defvar *powerset* '(1 1 1 1 1))
+(defvar powerset '(1 1 1 1 1))
 
 (setf *random-state* (make-random-state t))
 
@@ -27,7 +27,9 @@
 		)
 	)
 
-
+	(defun power(base exp)
+	 ( if (eq exp 0) 1 ( * base (power base (- exp 1)) ) )
+	)
 ;(defun fx (list)
 ;	(return (nth 1 list)))
 
@@ -37,29 +39,29 @@
 ;(defvar ith-row-ds
 ;	(fx AW))
 ;Calcualtes the weighted sum = ax + by + cz + .. so on
-(defun wt-sum (ith-row-aw ith-row-ds) 
-	(if (not (null ith-row-aw)) 
-		(+ (* (car ith-row-aw) (car ith-row-ds)) (wt-sum (cdr ith-row-aw) (cdr ith-row-ds)))
+(defun wt-sum (ith-row-aw ith-row-ds powerset)
+	(if (not (null ith-row-aw))
+		(+ (* (car ith-row-aw) (power (car ith-row-ds) (car powerset))) (wt-sum (cdr ith-row-aw) (cdr ith-row-ds) (cdr powerset)))
 		0
-	) 
-) 
-	
+	)
+)
+
 
 (defvar sum 0)
 
 ;Calculates % closeness btw 2 rows of AW matrix
-(defun closeness (ith-row-aw dataset)
-	;(let (sum-value (wt-sum (fx AW) (fx dataset)))
+(defun closeness (ith-row-aw dataset powerset)
+	;(let (sum-value (wt-sum (fx AW) (fx dataset) powerset))
 	;	(cl-val 0)
 		(setq sum 0)
 	;	((/ (abs (- sum-value (nth 6 (fx dataset)))) (nth 6 (fx dataset))))
 	;)
 	(loop for x in dataset
-		do (setq sum (+ sum (/ (abs (- (wt-sum ith-row-aw x) (nth 3 x))) (nth 3 x)) ))
+		do (setq sum (+ sum (/ (abs (- (wt-sum ith-row-aw x powerset) (nth 3 x))) (nth 3 x)) ))
 		)
-		(/ sum 13) 
+		(/ sum 13)
 	)
-	
+
 
 	;	(loop for x in dataset
 	;	do (setq sum (+ sum (wt-sum ith-row-aw x)))
@@ -70,7 +72,7 @@
 (defun 2d-array-to-list (array)
   (loop for i below (array-dimension array 0)
         collect (loop for j below (array-dimension array 1)
-                      collect (aref array i j))))	
+                      collect (aref array i j))))
 
 (defun list-to-2d-array (list1)
   (make-array (list (length list1)
@@ -79,14 +81,14 @@
 
 (defvar fitList '())
 
-(defun fitness (AW dataset)
+(defun fitness (AW dataset powerset)
 	(setf fitList '())
 	(loop for x in (2d-array-to-list AW)
 		do (
-			setq fitList (append fitList (list (/ 1 (+ 1 (closeness x  dataset) ))))
+			setq fitList (append fitList (list (/ 1 (+ 1 (closeness x  dataset powerset) ))))
 		)
 	)
-	;(/ 1 (+ 1 (closeness (list (aref AW i 0) (aref AW i 1) (aref AW i 2) (aref AW i 3) (aref AW i 4))  dataset) ))
+	;(/ 1 (+ 1 (closeness (list (aref AW i 0) (aref AW i 1) (aref AW i 2) (aref AW i 3) (aref AW i 4))  dataset powerset) ))
 
 )
 
@@ -160,20 +162,20 @@
 		)
 
 	)
-)	
+)
 
 (defvar newfitList '())
 
-(defun fitness-again (aw_list dataset)
+(defun fitness-again (aw_list dataset powerset)
 	(setq newfitList '())
 	(loop for x in aw_list
 		do(
-			setf newfitList (append newfitList (list (/ 1 (+ 1 (closeness x  dataset) ))))
+			setf newfitList (append newfitList (list (/ 1 (+ 1 (closeness x  dataset powerset) ))))
 		)
 	)
 )
 
-(defun maxq (list1) 
+(defun maxq (list1)
 	(if (eq (length list1) 1)
 		(car list1)
 		(if (> (car list1) (maxq (cdr list1)))
@@ -183,7 +185,7 @@
 	)
 )
 
-(defun minq (list1) 
+(defun minq (list1)
 	(if (eq (length list1) 1)
 		(car list1)
 		(if (< (car list1) (minq (cdr list1)))
@@ -292,28 +294,28 @@
 			)
 
 
-;(fitness AW dataset)
+;(fitness AW dataset powerset)
 ;(print fitList)
 ;(cross-over AW fitList)
 ;(print newpop)
-;(fitness-again newpop dataset)
-(defun genetic (AW dataset)
+;(fitness-again newpop dataset powerset)
+(defun genetic (AW dataset powerset)
 
 	;(setq newAW (list-to-2d-array (replace-chromes (2d-array-to-list AW) newpop fitList newfitList)))
 
-	(dotimes (i 3)
-		(fitness AW dataset)
+	(dotimes (i 4)
+		(fitness AW dataset powerset)
 		(cross-over AW fitList)
-		(fitness-again newpop dataset)
+		(fitness-again newpop dataset powerset)
 		(setq AW (list-to-2d-array (replace-chromes (2d-array-to-list AW) newpop fitList newfitList)))
 		;(fitness AW dataset)
 		;(print fitList)
-		
+
 		)
 
 		)
-(genetic AW dataset)
-
+(genetic AW dataset powerset)
+(print AW)
 ;
 ;(print c1)
 ;(print c2)
